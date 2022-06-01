@@ -14,45 +14,22 @@ const TVMAZE = 'https://api.tvmaze.com';
  *    (if no image URL given by API, put in a default image URL)
  */
 
-async function getShowsByTerm(searchTerm="") {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
-  const allShows = [];
-  const tvMazeURL = 'https://api.tvmaze.com/search/shows';
+async function getShowsByTerm(searchTerm) {
 
+  const tvMazeURL = `${TVMAZE}/search/shows`;
+  const showInfo = await axios.get(tvMazeURL, { params: { q: searchTerm } });
+  console.log('showInfo', showInfo);
 
-  const showInfo = await axios.get(tvMazeURL,{params: {q:searchTerm}});
-  console.log('showInfo',showInfo);
-  const idNameSumImg = showInfo.data.map((listing) => {
-    return {id:listing.show.id,
-    name:listing.show.name,
-    summary:listing.show.summary,
-    image:listing.show.image? listing.show.image.original:'https://tinyurl.com/tv-missing'
-  }});
+  const allShows = showInfo.data.map((listing) => {
+    return {
+      id: listing.show.id,
+      name: listing.show.name,
+      summary: listing.show.summary,
+      image: listing.show.image ? listing.show.image.original : 'https://tinyurl.com/tv-missing'
+    };
+  });
 
-  // {
-  //   image:show.image?valid:tinyURL
-  // }
-    // for(let i=0;i<10;i++){
-    //   try{
-    //     allShows.push({
-    //       id:showInfo.data[i].show.id,
-    //       name:showInfo.data[i].show.name,
-    //       summary:showInfo.data[i].show.summary,
-    //       image:showInfo.data[i].show.image.original
-    //     });
-    //   } catch(err){
-    //     allShows.push({
-    //       id:showInfo.data[i].show.id,
-    //       name:showInfo.data[i].show.name,
-    //       summary:showInfo.data[i].show.summary,
-    //       image: "https://tinyurl.com/tv-missing"
-    //     });
-    //   }
-    // }
-
-  // console.log('allShows = ',allShows);
-  return idNameSumImg;
-
+  return allShows;
 }
 
 /** Given list of shows, create markup for each and add to DOM */
@@ -62,7 +39,7 @@ function populateShows(shows) {
 
   for (let show of shows) {
     const $show = $(
-        `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
+      `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
               src="${show.image}"
@@ -79,15 +56,15 @@ function populateShows(shows) {
        </div>
       `);
 
-    $showsList.append($show);  }
+    $showsList.append($show);
+  }
 }
 
 
 
 /** Handle search form submission: get shows from API and display.
- *    Hide episodes area (that only gets shown if they ask for episodes)
+ *  Hide episodes area (that only gets shown if they ask for episodes)
  */
-
 async function searchForShowAndDisplay() {
   const term = $("#searchForm-term").val();
   const shows = await getShowsByTerm(term);
@@ -105,36 +82,27 @@ $searchForm.on("submit", async function (evt) {
 /** Given a show ID, get from API and await returned (promise) array of episodes:
  *      { id, name, season, number }
  */
-
-async function getEpisodesOfShow(id='1') {
-  const episodesAPI = TVMAZE+`/shows/${id}/episodes`;
+async function getEpisodesOfShow(id) {
+  const episodesAPI = TVMAZE + `/shows/${id}/episodes`;
   const listOfEpisodes = await axios.get(episodesAPI);
 
-  const episodesOfShow = listOfEpisodes.data.map(episode =>{
+  const episodesOfShow = listOfEpisodes.data.map(episode => {
     return {
-      id:episode.id,
-      name:episode.name,
-      season:episode.season,
-      number:episode.number
-    }});
+      id: episode.id,
+      name: episode.name,
+      season: episode.season,
+      number: episode.number
+    };
+  });
 
-    return episodesOfShow;
+  return episodesOfShow;
 }
 
 /** Function populateEpisodes takes an array of episodes
  * Appends a list of episodes to episode list in the DOM
  * returns undefined
  */
-
 function populateEpisodes(episodes) {
-  //Loop
-  //1 Create li
-  //Fill with info
-  //Append
-  //Restart
-  //Episodes is an array we'll use the forEach method()
-
-  //Unhide the episode Area
   $('#episodesArea').show();
 
 
@@ -143,137 +111,27 @@ function populateEpisodes(episodes) {
    * fills the li element with episode info
    * appends the created li
    */
-  function appendEpisode(epde){
-    const listing = $(`<li>${epde.name} (Season:${epde.season}, number ${epde.number})</li>`)
+  function _appendEpisode(ep) {
+    const listing = $(`<li>${ep.name} (Season ${ep.season}, number ${ep.number})</li>`);
     $('#episodesList').append(listing);
-    //<li>Pilot (season 1, number 1)</li>
   }
 
+  episodes.forEach(_appendEpisode);
+}
 
-  episodes.forEach(appendEpisode);
-
-  // const episodeListing = $('<li></li>'
-
-
-
-
- }
-
- /**Function defineEpisode takes an event target as input
-  * defines the show id of the episode button clicked.
-  * Calls the getEpisodes of Show()
-  * passes the array of episodes to populateEpisodes
-  *
-  */
-
- async function defineEpisode(evt){
-   console.log($(evt.target).closest('.Show'));
-   //We have a event
-   //Create a jQuery Event object with $
-   //Use the closest() method looking for the-
-   //"Closest element with the show class"
-   //Use .data('Data-Attribute-Name');
-   $('#episodesList').empty();
+/**Function defineEpisode takes an event target as input
+ * defines the show id of the episode button clicked.
+ * Calls the getEpisodes of Show()
+ * passes the array of episodes to populateEpisodes
+ *
+ */
+async function makeEpisodeListAndDisplay(evt) {
+  console.log($(evt.target).closest('.Show'));
+  $('#episodesList').empty();
   const showID = $(evt.target).closest('.Show').data('show-id');
   populateEpisodes(await getEpisodesOfShow(showID));
+}
+
+$('#showsList').on('click', 'button', makeEpisodeListAndDisplay);
 
 
-  //  const showID = evt.target.parentElement.parentElement.parentElement.getAttribute('data-show-id');
-  //  populateEpisodes(await getEpisodesOfShow(showID));
- }
-
-
-
-
-
-
-
- $('#showsList').on('click','button', defineEpisode);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //Attempt to resolve invaluid search.
-  // const firstShow = {
-  //   id:showInfo.data[0].show.id,
-  //   name:showInfo.data[0].show.name,
-  //   summary:showInfo.data[0].show.summary,
-  //   image:showInfo.data[0].show.image.original
-  // }
-  // for(let i=0;i<10;i++){
-  //   allShows.push({
-  //     id:showInfo.data[i].show.id,
-  //     name:showInfo.data[i].show.name,
-  //     summary:showInfo.data[i].show.summary,
-  //     image:showInfo.data[i].show.image.original
-  //   });
-  // }
-
-  // if(allShows.length === 0){
-  //   alert('No Matches Found!');
-
-    // const $show = $(
-    //   // `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
-    //    `<div class="media">
-    //      <img
-    //         src="https://tinyurl.com/tv-missing"
-    //         alt="Bletchly Circle San Francisco"
-    //         class="w-25 me-3">
-    //      <div class="media-body">
-    //        <h5 class="text-primary">Show not found</h5>
-    //        <div><small>''</small></div>
-    //        <button class="btn btn-outline-light btn-sm Show-getEpisodes">
-    //          Episodes
-    //        </button>
-    //      </div>
-    //    </div>
-    //  </div>
-    // `);
-
-
-
-  //   allShows.push({
-  //     id:'None found',
-  //     name:'None Found',
-  //     summary:"None Found",
-  //     image: "https://tinyurl.com/tv-missing"
-  //   });
-
-  //   return;
-  // } else {
-
-
-  //PLACHOLDER
-  // return [
-  //   {
-  //     id: 1767,
-  //     name: "The Bletchley Circle",
-  //     summary:
-  //       `<p><b>The Bletchley Circle</b> follows the journey of four ordinary
-  //          women with extraordinary skills that helped to end World War II.</p>
-  //        <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their
-  //          normal lives, modestly setting aside the part they played in
-  //          producing crucial intelligence, which helped the Allies to victory
-  //          and shortened the war. When Susan discovers a hidden code behind an
-  //          unsolved murder she is met by skepticism from the police. She
-  //          quickly realises she can only begin to crack the murders and bring
-  //          the culprit to justice with her former friends.</p>`,
-  //     image:
-  //         "http://static.tvmaze.com/uploads/images/medium_portrait/147/369403.jpg"
-  //   }
-  // ]
