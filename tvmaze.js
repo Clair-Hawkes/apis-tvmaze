@@ -19,29 +19,44 @@ async function getShowsByTerm(searchTerm="") {
 
 
   const showInfo = await axios.get(tvMazeURL,{params: {q:searchTerm}});
+  console.log('showInfo',showInfo.data);
+  const idNameSumImg = showInfo.data.map((listing) => {
+    return {id:listing.show.id,
+    name:listing.show.name,
+    summary:listing.show.summary,
+    image:listing.show.image.original
+  }});
+
+
+
+
+
+
+
+
   // {
   //   image:show.image?valid:tinyURL
   // }
-    for(let i=0;i<10;i++){
-      try{
-        allShows.push({
-          id:showInfo.data[i].show.id,
-          name:showInfo.data[i].show.name,
-          summary:showInfo.data[i].show.summary,
-          image:showInfo.data[i].show.image.original
-        });
-      } catch(err){
-        allShows.push({
-          id:showInfo.data[i].show.id,
-          name:showInfo.data[i].show.name,
-          summary:showInfo.data[i].show.summary,
-          image: "https://tinyurl.com/tv-missing"
-        });
-      }
-    }
+    // for(let i=0;i<10;i++){
+    //   try{
+    //     allShows.push({
+    //       id:showInfo.data[i].show.id,
+    //       name:showInfo.data[i].show.name,
+    //       summary:showInfo.data[i].show.summary,
+    //       image:showInfo.data[i].show.image.original
+    //     });
+    //   } catch(err){
+    //     allShows.push({
+    //       id:showInfo.data[i].show.id,
+    //       name:showInfo.data[i].show.name,
+    //       summary:showInfo.data[i].show.summary,
+    //       image: "https://tinyurl.com/tv-missing"
+    //     });
+    //   }
+    // }
 
-  console.log(allShows);
-  return allShows;
+  // console.log('allShows = ',allShows);
+  return idNameSumImg;
 
 }
 
