@@ -121,9 +121,91 @@ async function getEpisodesOfShow(id='1') {
     return episodesOfShow;
 }
 
-/** Write a clear docstring for this function... */
+/** Function populateEpisodes takes an array of episodes
+ * Appends a list of episodes to episode list in the DOM
+ * returns undefined
+ */
 
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) {
+  //Loop
+  //1 Create li
+  //Fill with info
+  //Append
+  //Restart
+  //Episodes is an array we'll use the forEach method()
+
+  //Unhide the episode Area
+  $('#episodesArea').show();
+
+
+  /**appendEpisode takes an episode object as input
+   * Creates an li element
+   * fills the li element with episode info
+   * appends the created li
+   */
+  function appendEpisode(epde){
+    const listing = $(`<li>${epde.name} (Season:${epde.season}, number ${epde.number})</li>`)
+    $('#episodesList').append(listing);
+    //<li>Pilot (season 1, number 1)</li>
+  }
+
+
+  episodes.forEach(appendEpisode);
+
+  // const episodeListing = $('<li></li>'
+
+
+
+
+ }
+
+ /**Function defineEpisode takes an event target as input
+  * defines the show id of the episode button clicked.
+  * Calls the getEpisodes of Show()
+  * passes the array of episodes to populateEpisodes
+  *
+  */
+
+ async function defineEpisode(evt){
+   console.log($(evt.target).closest('.Show'));
+   //We have a event
+   //Create a jQuery Event object with $
+   //Use the closest() method looking for the-
+   //"Closest element with the show class"
+   //Use .data('Data-Attribute-Name');
+   $('#episodesList').empty();
+  const showID = $(evt.target).closest('.Show').data('show-id');
+  populateEpisodes(await getEpisodesOfShow(showID));
+
+
+  //  const showID = evt.target.parentElement.parentElement.parentElement.getAttribute('data-show-id');
+  //  populateEpisodes(await getEpisodesOfShow(showID));
+ }
+
+
+
+
+
+
+
+ $('#showsList').on('click','button', defineEpisode);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   //Attempt to resolve invaluid search.
