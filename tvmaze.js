@@ -12,19 +12,19 @@ const $searchForm = $("#searchForm");
  *    (if no image URL given by API, put in a default image URL)
  */
 
-async function getShowsByTerm(searchTerm) {
+async function getShowsByTerm(searchTerm="") {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
   const allShows = [];
   const tvMazeURL = 'https://api.tvmaze.com/search/shows';
 
 
   const showInfo = await axios.get(tvMazeURL,{params: {q:searchTerm}});
-  const firstShow = {
-    id:showInfo.data[0].show.id,
-    name:showInfo.data[0].show.name,
-    summary:showInfo.data[0].show.summary,
-    image:showInfo.data[0].show.image.original
-  }
+  // const firstShow = {
+  //   id:showInfo.data[0].show.id,
+  //   name:showInfo.data[0].show.name,
+  //   summary:showInfo.data[0].show.summary,
+  //   image:showInfo.data[0].show.image.original
+  // }
   // for(let i=0;i<10;i++){
   //   allShows.push({
   //     id:showInfo.data[i].show.id,
@@ -49,10 +49,10 @@ async function getShowsByTerm(searchTerm) {
         id:showInfo.data[i].show.id,
         name:showInfo.data[i].show.name,
         summary:showInfo.data[i].show.summary,
+        image: "https://tinyurl.com/tv-missing"
       });
     }
   }
-
 
   console.log(allShows);
   return allShows;
@@ -80,7 +80,7 @@ async function getShowsByTerm(searchTerm) {
 }
 
 
-/** Given list of shows, create markup for each and to DOM */
+/** Given list of shows, create markup for each and add to DOM */
 
 function populateShows(shows) {
   $showsList.empty();
@@ -90,7 +90,7 @@ function populateShows(shows) {
         `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg"
+              src="${show.image}"
               alt="Bletchly Circle San Francisco"
               class="w-25 me-3">
            <div class="media-body">
@@ -106,6 +106,31 @@ function populateShows(shows) {
 
     $showsList.append($show);  }
 }
+
+// function populateShows(shows) {
+//   $showsList.empty();
+
+//   for (let show of shows) {
+//     const $show = $(
+//         `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
+//          <div class="media">
+//            <img
+//               src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg"
+//               alt="Bletchly Circle San Francisco"
+//               class="w-25 me-3">
+//            <div class="media-body">
+//              <h5 class="text-primary">${show.name}</h5>
+//              <div><small>${show.summary}</small></div>
+//              <button class="btn btn-outline-light btn-sm Show-getEpisodes">
+//                Episodes
+//              </button>
+//            </div>
+//          </div>
+//        </div>
+//       `);
+
+//     $showsList.append($show);  }
+// }
 
 
 /** Handle search form submission: get shows from API and display.
