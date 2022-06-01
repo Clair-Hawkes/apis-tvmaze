@@ -19,20 +19,13 @@ async function getShowsByTerm(searchTerm="") {
 
 
   const showInfo = await axios.get(tvMazeURL,{params: {q:searchTerm}});
-  console.log('showInfo',showInfo.data);
+  console.log('showInfo',showInfo);
   const idNameSumImg = showInfo.data.map((listing) => {
     return {id:listing.show.id,
     name:listing.show.name,
     summary:listing.show.summary,
     image:listing.show.image? listing.show.image.original:'https://tinyurl.com/tv-missing'
   }});
-
-
-
-
-
-
-
 
   // {
   //   image:show.image?valid:tinyURL
