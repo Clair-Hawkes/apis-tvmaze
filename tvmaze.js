@@ -24,7 +24,7 @@ async function getShowsByTerm(searchTerm="") {
     return {id:listing.show.id,
     name:listing.show.name,
     summary:listing.show.summary,
-    image:listing.show.image.original
+    image:listing.show.image? listing.show.image.original:'https://tinyurl.com/tv-missing'
   }});
 
 
